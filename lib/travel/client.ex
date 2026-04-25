@@ -68,7 +68,7 @@ defmodule Travel.Client do
         json: build_body(body),
         retry: :transient,
         max_retries: 2,
-        receive_timeout: 30_000
+        receive_timeout: 130_000
       )
 
     case Req.request(req) do
