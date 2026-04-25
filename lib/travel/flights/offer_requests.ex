@@ -47,6 +47,7 @@ defmodule Travel.Flights.OfferRequests do
       * `:cabin_class` - (optional) Preferred cabin class
       * `:max_connections` - (optional) Maximum connections per slice
       * `:private_fares` - (optional) Private fare codes
+      * `:airline_credit_ids` - (optional) Airline credit IDs to use
     * `opts` - Optional query parameters:
       * `:return_offers` - Include offers in response
       * `:supplier_timeout` - Supplier timeout in ms

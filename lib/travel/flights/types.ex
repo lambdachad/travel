@@ -482,7 +482,21 @@ defmodule Travel.Flights.Types do
     field(:amount, String.t())
     field(:currency, String.t() | nil)
     field(:type, atom())
+    field(:status, atom() | nil)
+    field(:failure_reason, String.t() | nil)
+    field(:order_id, String.t() | nil)
+    field(:airline_credit_id, String.t() | nil)
+    field(:live_mode, boolean() | nil)
     field(:created_at, String.t())
+  end
+
+  typedstruct module: AirlineCredit do
+    field(:id, String.t())
+    field(:order_id, String.t())
+    field(:amount, String.t())
+    field(:currency, String.t())
+    field(:created_at, String.t())
+    field(:live_mode, boolean() | nil)
   end
 
   typedstruct module: ComponentClientKey do
@@ -624,7 +638,8 @@ defmodule Travel.Flights.Types do
       refund_amount: data["refund_amount"],
       refund_currency: data["refund_currency"],
       refund_to: parse_atom(data["refund_to"]),
-      airline_credits: parse_list(data["airline_credits"], &parse_airline_credit/1)
+      airline_credits:
+        parse_list(data["airline_credits"], &parse_order_cancellation_airline_credit/1)
     }
   end
 
@@ -762,7 +777,27 @@ defmodule Travel.Flights.Types do
       amount: data["amount"],
       currency: data["currency"],
       type: parse_atom(data["type"]),
+      status: parse_atom(data["status"]),
+      failure_reason: data["failure_reason"],
+      order_id: data["order_id"],
+      airline_credit_id: data["airline_credit_id"],
+      live_mode: data["live_mode"],
       created_at: data["created_at"]
+    }
+  end
+
+  @doc """
+  Parses a raw map into an `AirlineCredit` struct.
+  """
+  @spec parse_airline_credit(map()) :: AirlineCredit.t()
+  def parse_airline_credit(data) do
+    %AirlineCredit{
+      id: data["id"],
+      order_id: data["order_id"],
+      amount: data["amount"],
+      currency: data["currency"],
+      created_at: data["created_at"],
+      live_mode: data["live_mode"]
     }
   end
 
@@ -993,7 +1028,7 @@ defmodule Travel.Flights.Types do
     }
   end
 
-  defp parse_airline_credit(data) do
+  defp parse_order_cancellation_airline_credit(data) do
     %OrderCancellationAirlineCredit{
       id: data["id"],
       credit_name: data["credit_name"],

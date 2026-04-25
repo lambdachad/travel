@@ -69,6 +69,8 @@ defmodule Travel.Flights.PartialOfferRequests do
   @doc """
   Get a partial offer request by ID.
 
+  **DEPRECATED**: This endpoint will be removed in the next major version of the Duffel API.
+
   ## Parameters
 
     * `config` - Travel configuration
@@ -81,6 +83,7 @@ defmodule Travel.Flights.PartialOfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
+  @deprecated "This endpoint will be removed in the next major version of the Duffel API"
   @spec get(Travel.t(), String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
   def get(config, partial_offer_request_id, opts \\ nil) do
@@ -103,6 +106,8 @@ defmodule Travel.Flights.PartialOfferRequests do
   @doc """
   Get fares matching selected partial offers.
 
+  **DEPRECATED**: This endpoint will be removed in the next major version of the Duffel API.
+
   ## Parameters
 
     * `config` - Travel configuration
@@ -115,6 +120,7 @@ defmodule Travel.Flights.PartialOfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
+  @deprecated "This endpoint will be removed in the next major version of the Duffel API"
   @spec get_fares_by_id(Travel.t(), String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
   def get_fares_by_id(config, partial_offer_request_id, opts \\ nil) do

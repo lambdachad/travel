@@ -8,7 +8,6 @@ defmodule Travel.Flights.Offers do
     * `GET /air/offers` - List offers for an offer request
     * `PATCH /air/offers/{id}/passengers/{passenger_id}` - Update offer passenger
     * `POST /air/offers/{id}/actions/price` - Price an offer
-    * `POST /air/offers/{id}/upsell` - Get upsell fares
 
   ## Examples
 
@@ -165,35 +164,6 @@ defmodule Travel.Flights.Offers do
     case Client.request(config, :post, path, params) do
       {:ok, response} ->
         parsed_data = Types.parse_offer_priced(response.data)
-        {:ok, %{response | data: parsed_data}}
-
-      {:error, error} ->
-        {:error, error}
-    end
-  end
-
-  @doc """
-  Get upsell fares for a basic fare offer.
-
-  ## Parameters
-
-    * `config` - Travel configuration
-    * `offer_id` - The offer ID
-
-  ## Returns
-
-    * `{:ok, %Travel.Types.DuffelResponse{data: [%Types.Offer{}]}}` on success
-    * `{:error, %Travel.Error{}}` on failure
-
-  """
-  @spec upsell_fares(Travel.t(), String.t()) ::
-          {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def upsell_fares(config, offer_id) do
-    path = "air/offers/#{offer_id}/upsell"
-
-    case Client.request(config, :post, path) do
-      {:ok, response} ->
-        parsed_data = Enum.map(response.data, &Types.parse_offer/1)
         {:ok, %{response | data: parsed_data}}
 
       {:error, error} ->

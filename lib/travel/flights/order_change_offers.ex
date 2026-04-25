@@ -56,7 +56,13 @@ defmodule Travel.Flights.OrderChangeOffers do
   ## Parameters
 
     * `config` - Travel configuration
-    * `opts` - Optional pagination parameters (`limit`, `before`, `after`)
+    * `opts` - Optional query parameters:
+      * `:order_change_request_id` - (required) The order change request ID
+      * `:limit` - Results per page
+      * `:before` - Cursor for previous page
+      * `:after` - Cursor for next page
+      * `:sort` - Sort order
+      * `:max_connections` - Maximum connections
 
   ## Returns
 
