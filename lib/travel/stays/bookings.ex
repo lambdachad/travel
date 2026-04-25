@@ -7,6 +7,7 @@ defmodule Travel.Stays.Bookings do
     * `POST /stays/bookings` - Create a booking
     * `GET /stays/bookings/{id}` - Get a booking
     * `GET /stays/bookings` - List bookings
+    * `PATCH /stays/bookings/{id}` - Update a booking
     * `POST /stays/bookings/{id}/actions/cancel` - Cancel a booking
 
   ## Examples
@@ -150,6 +151,35 @@ defmodule Travel.Stays.Bookings do
       parsed_data = Enum.map(response.data, &Types.parse_booking/1)
       %{response | data: parsed_data}
     end)
+  end
+
+  @doc """
+  Update a booking.
+
+  ## Parameters
+
+    * `config` - Travel configuration
+    * `booking_id` - The booking ID
+    * `params` - Update parameters:
+      * `:users` - (required) List of user IDs allowed to manage the booking
+
+  ## Returns
+
+    * `{:ok, %Travel.Types.DuffelResponse{data: %Types.StaysBooking{}}}` on success
+    * `{:error, %Travel.Error{}}` on failure
+
+  """
+  @spec update(Travel.t(), String.t(), map()) ::
+          {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
+  def update(config, booking_id, params) do
+    case Client.request(config, :patch, "stays/bookings/#{booking_id}", params) do
+      {:ok, response} ->
+        parsed_data = Types.parse_booking(response.data)
+        {:ok, %{response | data: parsed_data}}
+
+      {:error, error} ->
+        {:error, error}
+    end
   end
 
   @doc """

@@ -13,7 +13,7 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
       config = Travel.new(access_token: "duffel_test_xxx")
 
       # List changes for an order
-      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, "ord_123")
+      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, %{order_id: "ord_123"})
 
       # Accept a change
       {:ok, response} = Travel.Flights.AirlineInitiatedChanges.accept(config, "aic_123")
@@ -30,12 +30,16 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
   alias Travel.Flights.Types
 
   @doc """
-  List airline-initiated changes for an order.
+  List airline-initiated changes, optionally filtered by order.
 
   ## Parameters
 
     * `config` - Travel configuration
-    * `order_id` - The order ID
+    * `opts` - Optional query parameters:
+      * `:order_id` - Filter by order ID
+      * `:limit` - Results per page (max 200)
+      * `:before` - Cursor for previous page
+      * `:after` - Cursor for next page
 
   ## Returns
 
@@ -43,12 +47,10 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), String.t()) ::
+  @spec list(Travel.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, order_id) do
-    query_params = %{"order_id" => order_id}
-
-    case Client.request(config, :get, "air/airline_initiated_changes", nil, query_params) do
+  def list(config, opts \\ nil) do
+    case Client.request(config, :get, "air/airline_initiated_changes", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_airline_initiated_change/1)
         {:ok, %{response | data: parsed_data}}

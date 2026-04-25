@@ -40,7 +40,7 @@ defmodule Travel.Flights.SeatMapsTest do
       assert length(seat_map.cabins) == 1
       cabin = hd(seat_map.cabins)
       assert cabin.cabin_class == :economy
-      assert cabin.deck == "main"
+      assert cabin.deck == 0
       assert length(cabin.rows) == 1
     end
 
@@ -64,10 +64,10 @@ defmodule Travel.Flights.SeatMapsTest do
       "slice_id": "sli_123",
       "segment_id": "seg_123",
       "cabins": [{
-        "deck": "main",
+        "deck": 0,
         "cabin_class": "economy",
-        "wings": [{"rows": [1, 2, 3]}],
-        "aisles": [],
+        "wings": {"first_row_index": 1, "last_row_index": 3},
+        "aisles": 1,
         "rows": [{
           "sections": [{
             "elements": [{

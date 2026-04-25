@@ -12,11 +12,15 @@ defmodule Travel.Flights.AirlineCredits do
 
       config = Travel.new(access_token: "duffel_test_xxx")
 
-      # Create an airline credit
+       # Create an airline credit
       {:ok, response} = Travel.Flights.AirlineCredits.create(config, %{
-        order_id: "ord_123",
+        airline_iata_code: "BA",
         amount: "100.00",
-        currency: "GBP"
+        amount_currency: "GBP",
+        code: "1234567890123",
+        type: "eticket",
+        issued_on: "2026-01-15",
+        expires_at: "2027-01-15T00:00:00Z"
       })
 
       # Get an airline credit
@@ -38,9 +42,16 @@ defmodule Travel.Flights.AirlineCredits do
 
     * `config` - Travel configuration
     * `params` - Airline credit parameters:
-      * `:order_id` - (required) The order ID
+      * `:airline_iata_code` - (required) The airline IATA code
       * `:amount` - (required) The credit amount
-      * `:currency` - (required) The currency code
+      * `:amount_currency` - (required) The currency code (ISO 4217)
+      * `:code` - (required) The credit code
+      * `:type` - (required) The credit type (`"eticket"` or `"mco"`)
+      * `:issued_on` - (required) The date the credit was issued (ISO 8601 date)
+      * `:expires_at` - (required) The expiry datetime (ISO 8601)
+      * `:given_name` - (optional) Passenger given name
+      * `:family_name` - (optional) Passenger family name
+      * `:user_id` - (optional) Customer user ID
 
   ## Returns
 
@@ -98,7 +109,7 @@ defmodule Travel.Flights.AirlineCredits do
       * `:limit` - Results per page (max 200)
       * `:before` - Cursor for previous page
       * `:after` - Cursor for next page
-      * `:order_id` - Filter by order ID
+      * `:user_id` - Filter by customer user ID
 
   ## Returns
 

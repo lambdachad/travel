@@ -17,7 +17,9 @@ defmodule Travel.Flights.AirlineInitiatedChangesTest do
       end)
 
       config = travel_config(bypass.port)
-      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, "ord_123")
+
+      {:ok, response} =
+        Travel.Flights.AirlineInitiatedChanges.list(config, %{order_id: "ord_123"})
 
       assert response.status == 200
       assert length(response.data) == 2
@@ -33,7 +35,9 @@ defmodule Travel.Flights.AirlineInitiatedChangesTest do
       end)
 
       config = travel_config(bypass.port)
-      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, "ord_empty")
+
+      {:ok, response} =
+        Travel.Flights.AirlineInitiatedChanges.list(config, %{order_id: "ord_empty"})
 
       assert response.status == 200
       assert response.data == []
@@ -47,7 +51,9 @@ defmodule Travel.Flights.AirlineInitiatedChangesTest do
       end)
 
       config = travel_config(bypass.port)
-      {:error, error} = Travel.Flights.AirlineInitiatedChanges.list(config, "ord_invalid")
+
+      {:error, error} =
+        Travel.Flights.AirlineInitiatedChanges.list(config, %{order_id: "ord_invalid"})
 
       assert error.status == 404
     end

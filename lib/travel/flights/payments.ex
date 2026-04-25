@@ -15,7 +15,7 @@ defmodule Travel.Flights.Payments do
       # Create a payment
       {:ok, response} = Travel.Flights.Payments.create(config, %{
         order_id: "ord_123",
-        payment: %{type: "balance", amount: "150.00"}
+        payment: %{type: "balance", amount: "150.00", currency: "GBP"}
       })
 
       # Get a payment

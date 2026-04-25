@@ -343,8 +343,8 @@ defmodule Travel.Flights.Types do
     field(:change_total_currency, String.t())
     field(:new_total_amount, String.t())
     field(:new_total_currency, String.t())
-    field(:penalty_amount, String.t())
-    field(:penalty_currency, String.t())
+    field(:penalty_total_amount, String.t())
+    field(:penalty_total_currency, String.t())
     field(:refund_to, atom() | nil)
     field(:slices, OrderChangeOfferSlices.t())
     field(:expires_at, String.t())
@@ -375,6 +375,8 @@ defmodule Travel.Flights.Types do
     field(:id, String.t())
     field(:order_id, String.t())
     field(:live_mode, boolean())
+    field(:created_at, String.t() | nil)
+    field(:updated_at, String.t() | nil)
     field(:slices, map())
     field(:order_change_offers, list(OrderChangeOffer.t()))
   end
@@ -433,14 +435,15 @@ defmodule Travel.Flights.Types do
   end
 
   typedstruct module: SeatMapCabinWing do
-    field(:rows, list(integer()))
+    field(:first_row_index, integer())
+    field(:last_row_index, integer())
   end
 
   typedstruct module: SeatMapCabin do
-    field(:deck, String.t())
+    field(:deck, integer())
     field(:cabin_class, atom())
-    field(:wings, list(SeatMapCabinWing.t()) | nil)
-    field(:aisles, list(map()))
+    field(:wings, SeatMapCabinWing.t() | nil)
+    field(:aisles, integer())
     field(:rows, list(SeatMapCabinRow.t()))
   end
 
@@ -492,9 +495,14 @@ defmodule Travel.Flights.Types do
 
   typedstruct module: AirlineCredit do
     field(:id, String.t())
-    field(:order_id, String.t())
+    field(:airline_iata_code, String.t())
     field(:amount, String.t())
-    field(:currency, String.t())
+    field(:amount_currency, String.t())
+    field(:code, String.t())
+    field(:type, atom())
+    field(:issued_on, String.t())
+    field(:expires_at, String.t() | nil)
+    field(:passenger_id, String.t() | nil)
     field(:created_at, String.t())
     field(:live_mode, boolean() | nil)
   end
@@ -655,8 +663,8 @@ defmodule Travel.Flights.Types do
       change_total_currency: data["change_total_currency"],
       new_total_amount: data["new_total_amount"],
       new_total_currency: data["new_total_currency"],
-      penalty_amount: data["penalty_amount"],
-      penalty_currency: data["penalty_currency"],
+      penalty_total_amount: data["penalty_total_amount"],
+      penalty_total_currency: data["penalty_total_currency"],
       refund_to: parse_atom(data["refund_to"]),
       slices: parse_change_offer_slices(data["slices"]),
       expires_at: data["expires_at"],
@@ -699,6 +707,8 @@ defmodule Travel.Flights.Types do
       id: data["id"],
       order_id: data["order_id"],
       live_mode: data["live_mode"],
+      created_at: data["created_at"],
+      updated_at: data["updated_at"],
       slices: data["slices"],
       order_change_offers: parse_list(data["order_change_offers"], &parse_order_change_offer/1)
     }
@@ -793,9 +803,14 @@ defmodule Travel.Flights.Types do
   def parse_airline_credit(data) do
     %AirlineCredit{
       id: data["id"],
-      order_id: data["order_id"],
+      airline_iata_code: data["airline_iata_code"],
       amount: data["amount"],
-      currency: data["currency"],
+      amount_currency: data["amount_currency"],
+      code: data["code"],
+      type: parse_atom(data["type"]),
+      issued_on: data["issued_on"],
+      expires_at: data["expires_at"],
+      passenger_id: data["passenger_id"],
       created_at: data["created_at"],
       live_mode: data["live_mode"]
     }
@@ -1075,14 +1090,19 @@ defmodule Travel.Flights.Types do
     %SeatMapCabin{
       deck: data["deck"],
       cabin_class: parse_atom(data["cabin_class"]),
-      wings: parse_list(data["wings"], &parse_wing/1),
+      wings: parse_wing(data["wings"]),
       aisles: data["aisles"],
       rows: parse_list(data["rows"], &parse_seat_map_row/1)
     }
   end
 
-  defp parse_wing(data) do
-    %SeatMapCabinWing{rows: data["rows"]}
+  defp parse_wing(nil), do: nil
+
+  defp parse_wing(data) when is_map(data) do
+    %SeatMapCabinWing{
+      first_row_index: data["first_row_index"],
+      last_row_index: data["last_row_index"]
+    }
   end
 
   defp parse_seat_map_row(data) do

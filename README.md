@@ -241,9 +241,6 @@ Create flight searches and retrieve offers:
   intended_payment_methods: [%{type: "balance"}],
   intended_services: []
 })
-
-# Get upsell fares
-{:ok, response} = Travel.Flights.Offers.upsell_fares(config, "off_123")
 ```
 
 ### Orders
@@ -251,9 +248,7 @@ Create flight searches and retrieve offers:
 ```elixir
 # Create an order
 {:ok, response} = Travel.Flights.Orders.create(config, %{
-  selected_offers: [
-    %{offer_id: "off_123", passenger_ids: ["pas_123"]}
-  ],
+  selected_offers: ["off_123"],
   passengers: [
     %{
       given_name: "John",
@@ -265,7 +260,7 @@ Create flight searches and retrieve offers:
       phone_number: "+447700900000"
     }
   ],
-  type: "instant",  # or "pay_later"
+  type: "instant",
   metadata: %{"customer_ref" => "ABC123"}
 })
 
@@ -287,8 +282,8 @@ Create flight searches and retrieve offers:
 
 # Add services (baggage, seats)
 {:ok, response} = Travel.Flights.Orders.add_services(config, "ord_123", %{
-  payment: %{type: "balance", amount: "50.00"},
-  add_services: [%{id: "aso_123", quantity: 1}]
+  payment: %{type: "balance", amount: "30.00", currency: "GBP"},
+  add_services: [%{id: "asr_123", quantity: 1}]
 })
 ```
 
@@ -298,7 +293,7 @@ Create flight searches and retrieve offers:
 # Pay for a pay-later order
 {:ok, response} = Travel.Flights.Payments.create(config, %{
   order_id: "ord_123",
-  payment: %{type: "balance", amount: "150.00"}
+  payment: %{type: "balance", amount: "150.00", currency: "GBP"}
 })
 ```
 
@@ -338,16 +333,23 @@ Create flight searches and retrieve offers:
   }
 })
 
-# Get change offers
-{:ok, response} = Travel.Flights.OrderChangeOffers.list(config)
+# List change offers for a change request
+{:ok, response} = Travel.Flights.OrderChangeOffers.list(config, %{
+  order_change_request_id: "ocr_123"
+})
 
 # Create an order change
 {:ok, response} = Travel.Flights.OrderChanges.create(config, %{
   selected_order_change_offer: "oco_123"
 })
 
-# Confirm the change
+# Confirm the change (without payment)
 {:ok, response} = Travel.Flights.OrderChanges.confirm(config, "orc_123")
+
+# Confirm with payment
+{:ok, response} = Travel.Flights.OrderChanges.confirm(config, "orc_123", %{
+  payment: %{type: "balance", amount: "50.00", currency: "GBP"}
+})
 ```
 
 ### Batch Offer Requests
@@ -376,7 +378,12 @@ For multi-step search flows:
 })
 
 {:ok, response} = Travel.Flights.PartialOfferRequests.get(config, "por_123", %{
-  selected_partial_offer: ["off_123"]
+  selected_partial_offer: "off_123"
+})
+
+# Get fares for a partial offer request
+{:ok, response} = Travel.Flights.PartialOfferRequests.get_fares_by_id(config, "por_123", %{
+  selected_partial_offer: "off_456"
 })
 ```
 
@@ -384,7 +391,7 @@ For multi-step search flows:
 
 ```elixir
 # List changes for an order
-{:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, "ord_123")
+{:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, %{order_id: "ord_123"})
 
 # Accept a change
 {:ok, response} = Travel.Flights.AirlineInitiatedChanges.accept(config, "aic_123")
@@ -393,6 +400,27 @@ For multi-step search flows:
 {:ok, response} = Travel.Flights.AirlineInitiatedChanges.update(config, "aic_123", %{
   action_taken: "accepted"
 })
+```
+
+### Airline Credits
+
+```elixir
+# Create an airline credit
+{:ok, response} = Travel.Flights.AirlineCredits.create(config, %{
+  airline_iata_code: "BA",
+  amount: "100.00",
+  amount_currency: "GBP",
+  code: "1234567890123",
+  type: "eticket",
+  issued_on: "2026-01-15",
+  expires_at: "2027-01-15T00:00:00Z"
+})
+
+# Get an airline credit
+{:ok, response} = Travel.Flights.AirlineCredits.get(config, "acd_123")
+
+# List airline credits
+{:ok, response} = Travel.Flights.AirlineCredits.list(config, %{user_id: "icu_123"})
 ```
 
 ## Response Format

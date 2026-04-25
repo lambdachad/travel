@@ -85,6 +85,10 @@ defmodule Travel.Stays.Types do
     field(:estimated_commission_amount, String.t() | nil)
     field(:estimated_commission_currency, String.t() | nil)
     field(:quantity_available, integer() | nil)
+    field(:deal_types, list(String.t()))
+    field(:negotiated_rate_id, String.t() | nil)
+    field(:public_amount, String.t() | nil)
+    field(:public_currency, String.t() | nil)
   end
 
   typedstruct module: StaysRoom do
@@ -143,10 +147,16 @@ defmodule Travel.Stays.Types do
     field(:review_count, integer() | nil)
     field(:review_score, float() | nil)
     field(:supported_loyalty_programme, atom() | nil)
+    field(:payment_instruction_supported, boolean() | nil)
 
     field(
       :check_in_information,
-      %{check_in_after_time: String.t(), check_out_before_time: String.t()} | nil
+      %{
+        check_in_after_time: String.t(),
+        check_in_before_time: String.t() | nil,
+        check_out_before_time: String.t()
+      }
+      | nil
     )
 
     field(:key_collection, StaysBookingKeyCollection.t() | nil)
@@ -203,6 +213,8 @@ defmodule Travel.Stays.Types do
     field(:key_collection, StaysBookingKeyCollection.t() | nil)
     field(:estimated_commission_amount, String.t() | nil)
     field(:estimated_commission_currency, String.t() | nil)
+    field(:users, list(String.t()) | nil)
+    field(:guest_types, list(map()) | nil)
   end
 
   typedstruct module: StaysSearchResult do
@@ -221,6 +233,7 @@ defmodule Travel.Stays.Types do
     field(:cheapest_rate_due_at_accommodation_amount, String.t() | nil)
     field(:cheapest_rate_due_at_accommodation_currency, String.t())
     field(:expires_at, String.t())
+    field(:supported_negotiated_rates, list(map()) | nil)
   end
 
   typedstruct module: StaysSearchResponse do
@@ -268,6 +281,7 @@ defmodule Travel.Stays.Types do
       review_count: data["review_count"],
       review_score: data["review_score"],
       supported_loyalty_programme: parse_atom(data["supported_loyalty_programme"]),
+      payment_instruction_supported: data["payment_instruction_supported"],
       check_in_information: parse_check_in_info(data["check_in_information"]),
       key_collection: parse_key_collection(data["key_collection"])
     }
@@ -324,7 +338,9 @@ defmodule Travel.Stays.Types do
       metadata: data["metadata"],
       key_collection: parse_key_collection(data["key_collection"]),
       estimated_commission_amount: data["estimated_commission_amount"],
-      estimated_commission_currency: data["estimated_commission_currency"]
+      estimated_commission_currency: data["estimated_commission_currency"],
+      users: data["users"],
+      guest_types: data["guest_types"]
     }
   end
 
@@ -361,7 +377,8 @@ defmodule Travel.Stays.Types do
         data["cheapest_rate_due_at_accommodation_amount"],
       cheapest_rate_due_at_accommodation_currency:
         data["cheapest_rate_due_at_accommodation_currency"],
-      expires_at: data["expires_at"]
+      expires_at: data["expires_at"],
+      supported_negotiated_rates: data["supported_negotiated_rates"]
     }
   end
 
@@ -507,7 +524,11 @@ defmodule Travel.Stays.Types do
       name: data["name"],
       estimated_commission_amount: data["estimated_commission_amount"],
       estimated_commission_currency: data["estimated_commission_currency"],
-      quantity_available: data["quantity_available"]
+      quantity_available: data["quantity_available"],
+      deal_types: data["deal_types"] || [],
+      negotiated_rate_id: data["negotiated_rate_id"],
+      public_amount: data["public_amount"],
+      public_currency: data["public_currency"]
     }
   end
 
@@ -531,6 +552,7 @@ defmodule Travel.Stays.Types do
   defp parse_check_in_info(data) do
     %{
       check_in_after_time: data["check_in_after_time"],
+      check_in_before_time: data["check_in_before_time"],
       check_out_before_time: data["check_out_before_time"]
     }
   end
@@ -546,7 +568,7 @@ defmodule Travel.Stays.Types do
   end
 
   defp parse_booking_guest(data) do
-    %{given_name: data["given_name"], family_name: data["family_name"]}
+    %{given_name: data["given_name"], family_name: data["family_name"], user_id: data["user_id"]}
   end
 
   defp parse_review(data) do

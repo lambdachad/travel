@@ -82,7 +82,7 @@ defmodule Travel.Flights.OrderChangeOffersTest do
             conn
             |> Plug.Conn.resp(
               200,
-              ~s({"data": [{"id": "oco_1", "order_id": "ord_1", "change_total_amount": "50.00", "change_total_currency": "GBP", "new_total_amount": "200.00", "new_total_currency": "GBP", "penalty_amount": "25.00", "penalty_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-01T12:00:00Z", "created_at": "2025-04-25T10:00:00Z", "updated_at": null, "order_change_id": null}], "meta": {"limit": 1, "after": "cursor_2"}})
+              ~s({"data": [{"id": "oco_1", "order_id": "ord_1", "change_total_amount": "50.00", "change_total_currency": "GBP", "new_total_amount": "200.00", "new_total_currency": "GBP", "penalty_total_amount": "25.00", "penalty_total_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-01T12:00:00Z", "created_at": "2025-04-25T10:00:00Z", "updated_at": null, "order_change_id": null}], "meta": {"limit": 1, "after": "cursor_2"}})
             )
             |> Plug.Conn.put_resp_header("content-type", "application/json")
 
@@ -93,7 +93,7 @@ defmodule Travel.Flights.OrderChangeOffersTest do
             conn
             |> Plug.Conn.resp(
               200,
-              ~s({"data": [{"id": "oco_2", "order_id": "ord_2", "change_total_amount": "75.00", "change_total_currency": "GBP", "new_total_amount": "250.00", "new_total_currency": "GBP", "penalty_amount": "30.00", "penalty_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-02T12:00:00Z", "created_at": "2025-04-25T11:00:00Z", "updated_at": null, "order_change_id": null}], "meta": {"limit": 1, "after": null}})
+              ~s({"data": [{"id": "oco_2", "order_id": "ord_2", "change_total_amount": "75.00", "change_total_currency": "GBP", "new_total_amount": "250.00", "new_total_currency": "GBP", "penalty_total_amount": "30.00", "penalty_total_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-02T12:00:00Z", "created_at": "2025-04-25T11:00:00Z", "updated_at": null, "order_change_id": null}], "meta": {"limit": 1, "after": null}})
             )
             |> Plug.Conn.put_resp_header("content-type", "application/json")
         end
@@ -118,8 +118,8 @@ defmodule Travel.Flights.OrderChangeOffersTest do
       "change_total_currency": "GBP",
       "new_total_amount": "200.00",
       "new_total_currency": "GBP",
-      "penalty_amount": "25.00",
-      "penalty_currency": "GBP",
+      "penalty_total_amount": "25.00",
+      "penalty_total_currency": "GBP",
       "refund_to": "original_form_of_payment",
       "slices": {"add": [], "remove": []},
       "expires_at": "2025-05-01T12:00:00Z",
@@ -131,8 +131,8 @@ defmodule Travel.Flights.OrderChangeOffersTest do
 
   defp change_offers_list_response do
     ~s({"data": [
-      {"id": "oco_1", "order_id": "ord_1", "change_total_amount": "50.00", "change_total_currency": "GBP", "new_total_amount": "200.00", "new_total_currency": "GBP", "penalty_amount": "25.00", "penalty_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-01T12:00:00Z", "created_at": "2025-04-25T10:00:00Z", "updated_at": null, "order_change_id": null},
-      {"id": "oco_2", "order_id": "ord_2", "change_total_amount": "75.00", "change_total_currency": "GBP", "new_total_amount": "250.00", "new_total_currency": "GBP", "penalty_amount": "30.00", "penalty_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-02T12:00:00Z", "created_at": "2025-04-25T11:00:00Z", "updated_at": null, "order_change_id": null}
+      {"id": "oco_1", "order_id": "ord_1", "change_total_amount": "50.00", "change_total_currency": "GBP", "new_total_amount": "200.00", "new_total_currency": "GBP", "penalty_total_amount": "25.00", "penalty_total_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-01T12:00:00Z", "created_at": "2025-04-25T10:00:00Z", "updated_at": null, "order_change_id": null},
+      {"id": "oco_2", "order_id": "ord_2", "change_total_amount": "75.00", "change_total_currency": "GBP", "new_total_amount": "250.00", "new_total_currency": "GBP", "penalty_total_amount": "30.00", "penalty_total_currency": "GBP", "refund_to": "original_form_of_payment", "slices": {"add": [], "remove": []}, "expires_at": "2025-05-02T12:00:00Z", "created_at": "2025-04-25T11:00:00Z", "updated_at": null, "order_change_id": null}
     ]})
   end
 

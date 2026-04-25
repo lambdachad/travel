@@ -252,7 +252,7 @@ defmodule Travel.Flights.OrdersTest do
 
       {:ok, response} =
         Travel.Flights.Orders.add_services(config, "ord_123", %{
-          payment: %{type: "balance"},
+          payment: %{type: "balance", amount: "30.00", currency: "GBP"},
           add_services: [%{id: "asr_123", quantity: 1}]
         })
 
@@ -271,7 +271,7 @@ defmodule Travel.Flights.OrdersTest do
 
       {:error, error} =
         Travel.Flights.Orders.add_services(config, "ord_123", %{
-          payment: %{type: "balance"},
+          payment: %{type: "balance", amount: "30.00", currency: "GBP"},
           add_services: [%{id: "asr_invalid", quantity: 1}]
         })
 
