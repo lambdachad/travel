@@ -17,7 +17,7 @@ defmodule Travel.Flights.Orders do
 
       # Create an order
       {:ok, response} = Travel.Flights.Orders.create(config, %{
-        selected_offers: [%{offer_id: "off_123", passenger_ids: ["pas_123"]}],
+        selected_offers: ["off_123"],
         passengers: [%{
           given_name: "John",
           family_name: "Smith",
@@ -25,7 +25,7 @@ defmodule Travel.Flights.Orders do
           gender: "m",
           title: "mr",
           email: "john@example.com",
-          phone_number: "+447700900000"
+          phone_number: "+442080160509"
         }],
         type: "instant"
       })
@@ -51,7 +51,7 @@ defmodule Travel.Flights.Orders do
 
     * `config` - Travel configuration
     * `params` - Order parameters:
-      * `:selected_offers` - (required) List of selected offers with passenger IDs
+      * `:selected_offers` - (required) List of selected offer IDs (e.g., `["off_123"]`)
       * `:passengers` - (required) List of passenger details
       * `:type` - (required) `"instant"` or `"pay_later"`
       * `:services` - (optional) Additional services to add

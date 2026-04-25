@@ -13,7 +13,7 @@ defmodule Travel.Flights.OrdersTest do
         decoded = Jason.decode!(body)
         data = decoded["data"]
 
-        assert length(data["selected_offers"]) == 1
+        assert data["selected_offers"] == ["off_123"]
         assert length(data["passengers"]) == 1
         assert data["type"] == "instant"
 
@@ -26,7 +26,7 @@ defmodule Travel.Flights.OrdersTest do
 
       {:ok, response} =
         Travel.Flights.Orders.create(config, %{
-          selected_offers: [%{offer_id: "off_123", passenger_ids: ["pas_123"]}],
+          selected_offers: ["off_123"],
           passengers: [
             %{
               given_name: "John",
@@ -35,7 +35,7 @@ defmodule Travel.Flights.OrdersTest do
               gender: "m",
               title: "mr",
               email: "john@example.com",
-              phone_number: "+447700900000"
+              phone_number: "+442080160509"
             }
           ],
           type: "instant"
@@ -58,7 +58,7 @@ defmodule Travel.Flights.OrdersTest do
 
       {:error, error} =
         Travel.Flights.Orders.create(config, %{
-          selected_offers: [%{offer_id: "off_expired", passenger_ids: ["pas_123"]}],
+          selected_offers: ["off_expired"],
           passengers: [
             %{
               given_name: "John",
@@ -67,7 +67,7 @@ defmodule Travel.Flights.OrdersTest do
               gender: "m",
               title: "mr",
               email: "john@example.com",
-              phone_number: "+447700900000"
+              phone_number: "+442080160509"
             }
           ],
           type: "instant"
