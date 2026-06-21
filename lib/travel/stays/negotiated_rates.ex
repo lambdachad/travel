@@ -12,28 +12,26 @@ defmodule Travel.Stays.NegotiatedRates do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a negotiated rate
-      {:ok, response} = Travel.Stays.NegotiatedRates.create(config, %{
+      {:ok, response} = Travel.Stays.NegotiatedRates.create(%{
         accommodation_ids: ["acc_123"],
         display_name: "Corporate Rate",
         rate_access_code: "CORP123"
       })
 
       # List negotiated rates
-      {:ok, response} = Travel.Stays.NegotiatedRates.list(config)
+      {:ok, response} = Travel.Stays.NegotiatedRates.list()
 
       # Get a negotiated rate
-      {:ok, response} = Travel.Stays.NegotiatedRates.get(config, "nra_123")
+      {:ok, response} = Travel.Stays.NegotiatedRates.get("nra_123")
 
       # Update a negotiated rate
-      {:ok, response} = Travel.Stays.NegotiatedRates.update(config, "nra_123", %{
+      {:ok, response} = Travel.Stays.NegotiatedRates.update("nra_123", %{
         display_name: "Updated Corporate Rate"
       })
 
       # Delete a negotiated rate
-      {:ok, response} = Travel.Stays.NegotiatedRates.delete(config, "nra_123")
+      {:ok, response} = Travel.Stays.NegotiatedRates.delete("nra_123")
 
   @link https://duffel.com/docs/api/v2/negotiated-rates
   """
@@ -45,7 +43,6 @@ defmodule Travel.Stays.NegotiatedRates do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Negotiated rate parameters:
       * `:accommodation_ids` - (required) List of accommodation IDs
       * `:display_name` - (required) Display name for the rate
@@ -57,9 +54,10 @@ defmodule Travel.Stays.NegotiatedRates do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
     Client.request(config, :post, "stays/negotiated_rates", params)
   end
 
@@ -68,7 +66,6 @@ defmodule Travel.Stays.NegotiatedRates do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:limit` - Results per page (max 200)
       * `:before` - Cursor for previous page
@@ -80,9 +77,10 @@ defmodule Travel.Stays.NegotiatedRates do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
     Client.request(config, :get, "stays/negotiated_rates", nil, opts)
   end
 
@@ -91,7 +89,6 @@ defmodule Travel.Stays.NegotiatedRates do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `negotiated_rate_id` - The negotiated rate ID
 
   ## Returns
@@ -100,9 +97,10 @@ defmodule Travel.Stays.NegotiatedRates do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, negotiated_rate_id) do
+  def get(negotiated_rate_id) do
+    config = Travel.config!()
     Client.request(config, :get, "stays/negotiated_rates/#{negotiated_rate_id}")
   end
 
@@ -111,7 +109,6 @@ defmodule Travel.Stays.NegotiatedRates do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `negotiated_rate_id` - The negotiated rate ID
     * `params` - Update parameters:
       * `:accommodation_ids` - (optional) Updated list of accommodation IDs
@@ -124,9 +121,10 @@ defmodule Travel.Stays.NegotiatedRates do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec update(Travel.t(), String.t(), map()) ::
+  @spec update(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def update(config, negotiated_rate_id, params) do
+  def update(negotiated_rate_id, params) do
+    config = Travel.config!()
     Client.request(config, :patch, "stays/negotiated_rates/#{negotiated_rate_id}", params)
   end
 
@@ -135,7 +133,6 @@ defmodule Travel.Stays.NegotiatedRates do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `negotiated_rate_id` - The negotiated rate ID
 
   ## Returns
@@ -144,9 +141,10 @@ defmodule Travel.Stays.NegotiatedRates do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec delete(Travel.t(), String.t()) ::
+  @spec delete(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def delete(config, negotiated_rate_id) do
+  def delete(negotiated_rate_id) do
+    config = Travel.config!()
     Client.request(config, :delete, "stays/negotiated_rates/#{negotiated_rate_id}")
   end
 end

@@ -12,10 +12,8 @@ defmodule Travel.Stays.Bookings do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a booking
-      {:ok, response} = Travel.Stays.Bookings.create(config, %{
+      {:ok, response} = Travel.Stays.Bookings.create(%{
         quote_id: "quo_123",
         guests: [%{given_name: "John", family_name: "Smith"}],
         email: "john@example.com",
@@ -23,13 +21,13 @@ defmodule Travel.Stays.Bookings do
       })
 
       # Get a booking
-      {:ok, response} = Travel.Stays.Bookings.get(config, "bok_123")
+      {:ok, response} = Travel.Stays.Bookings.get("bok_123")
 
       # List bookings
-      {:ok, response} = Travel.Stays.Bookings.list(config, %{limit: 20})
+      {:ok, response} = Travel.Stays.Bookings.list(%{limit: 20})
 
       # Cancel a booking
-      {:ok, response} = Travel.Stays.Bookings.cancel(config, "bok_123")
+      {:ok, response} = Travel.Stays.Bookings.cancel("bok_123")
 
   @link https://duffel.com/docs/api/stays/bookings
   """
@@ -42,7 +40,6 @@ defmodule Travel.Stays.Bookings do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Booking parameters:
       * `:quote_id` - (required) The quote ID to book
       * `:guests` - (required) List of guests with `given_name` and `family_name`
@@ -50,7 +47,7 @@ defmodule Travel.Stays.Bookings do
       * `:phone_number` - (required) Lead guest phone number
       * `:loyalty_programme_account_number` - (optional) Loyalty account number
       * `:accommodation_special_requests` - (optional) Special requests
-      * `:payment` - (optional) Payment info (`%{card_id: "..."}` or `%{three_d_secure_session_id: "..."}`)
+      * `:payment` - (optional) Payment info
       * `:metadata` - (optional) Custom metadata map
       * `:users` - (optional) List of user IDs allowed to manage the booking
 
@@ -60,9 +57,11 @@ defmodule Travel.Stays.Bookings do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "stays/bookings", params) do
       {:ok, response} ->
         parsed_data = Types.parse_booking(response.data)
@@ -78,7 +77,6 @@ defmodule Travel.Stays.Bookings do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `booking_id` - The booking ID
 
   ## Returns
@@ -87,9 +85,11 @@ defmodule Travel.Stays.Bookings do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, booking_id) do
+  def get(booking_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/bookings/#{booking_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_booking(response.data)
@@ -105,7 +105,6 @@ defmodule Travel.Stays.Bookings do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:limit` - Results per page (max 200)
       * `:before` - Cursor for previous page
@@ -118,9 +117,11 @@ defmodule Travel.Stays.Bookings do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/bookings", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_booking/1)
@@ -136,7 +137,6 @@ defmodule Travel.Stays.Bookings do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters (e.g., `user_id`)
 
   ## Returns
@@ -144,8 +144,10 @@ defmodule Travel.Stays.Bookings do
     A `Stream` that yields `%Travel.Types.DuffelResponse{}` for each page.
 
   """
-  @spec stream(Travel.t(), map() | nil) :: Enumerable.t()
-  def stream(config, opts \\ nil) do
+  @spec stream(map() | nil) :: Enumerable.t()
+  def stream(opts \\ nil) do
+    config = Travel.config!()
+
     Client.stream(config, "stays/bookings", opts)
     |> Stream.map(fn response ->
       parsed_data = Enum.map(response.data, &Types.parse_booking/1)
@@ -158,7 +160,6 @@ defmodule Travel.Stays.Bookings do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `booking_id` - The booking ID
     * `params` - Update parameters:
       * `:users` - (required) List of user IDs allowed to manage the booking
@@ -169,9 +170,11 @@ defmodule Travel.Stays.Bookings do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec update(Travel.t(), String.t(), map()) ::
+  @spec update(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def update(config, booking_id, params) do
+  def update(booking_id, params) do
+    config = Travel.config!()
+
     case Client.request(config, :patch, "stays/bookings/#{booking_id}", params) do
       {:ok, response} ->
         parsed_data = Types.parse_booking(response.data)
@@ -187,7 +190,6 @@ defmodule Travel.Stays.Bookings do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `booking_id` - The booking ID to cancel
 
   ## Returns
@@ -196,9 +198,10 @@ defmodule Travel.Stays.Bookings do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec cancel(Travel.t(), String.t()) ::
+  @spec cancel(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def cancel(config, booking_id) do
+  def cancel(booking_id) do
+    config = Travel.config!()
     path = "stays/bookings/#{booking_id}/actions/cancel"
 
     case Client.request(config, :post, path) do

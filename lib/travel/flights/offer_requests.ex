@@ -10,10 +10,8 @@ defmodule Travel.Flights.OfferRequests do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create an offer request
-      {:ok, response} = Travel.Flights.OfferRequests.create(config, %{
+      {:ok, response} = Travel.Flights.OfferRequests.create(%{
         slices: [
           %{origin: "LHR", destination: "JFK", departure_date: "2025-06-01"}
         ],
@@ -21,13 +19,13 @@ defmodule Travel.Flights.OfferRequests do
       })
 
       # Create and return offers in the response
-      {:ok, response} = Travel.Flights.OfferRequests.create(config, %{
+      {:ok, response} = Travel.Flights.OfferRequests.create(%{
         slices: [...],
         passengers: [...]
       }, %{return_offers: true})
 
       # Get an offer request
-      {:ok, response} = Travel.Flights.OfferRequests.get(config, "orq_123")
+      {:ok, response} = Travel.Flights.OfferRequests.get("orq_123")
 
   @link https://duffel.com/docs/api/offer-requests
   """
@@ -40,7 +38,6 @@ defmodule Travel.Flights.OfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Offer request parameters:
       * `:slices` - (required) List of trip segments
       * `:passengers` - (required) List of passengers
@@ -58,9 +55,11 @@ defmodule Travel.Flights.OfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map(), map() | nil) ::
+  @spec create(map(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params, opts \\ nil) do
+  def create(params, opts \\ nil) do
+    config = Travel.config!()
+
     query_params =
       if opts do
         opts
@@ -88,7 +87,6 @@ defmodule Travel.Flights.OfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `offer_request_id` - The offer request ID
 
   ## Returns
@@ -97,9 +95,11 @@ defmodule Travel.Flights.OfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, offer_request_id) do
+  def get(offer_request_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/offer_requests/#{offer_request_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_offer_request(response.data)
@@ -115,7 +115,6 @@ defmodule Travel.Flights.OfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional pagination parameters (`limit`, `before`, `after`)
 
   ## Returns
@@ -124,9 +123,11 @@ defmodule Travel.Flights.OfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/offer_requests", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_offer_request/1)
@@ -145,8 +146,10 @@ defmodule Travel.Flights.OfferRequests do
     A `Stream` that yields `%Travel.Types.DuffelResponse{}` for each page.
 
   """
-  @spec stream(Travel.t()) :: Enumerable.t()
-  def stream(config) do
+  @spec stream() :: Enumerable.t()
+  def stream do
+    config = Travel.config!()
+
     Client.stream(config, "air/offer_requests")
     |> Stream.map(fn response ->
       parsed_data = Enum.map(response.data, &Types.parse_offer_request/1)

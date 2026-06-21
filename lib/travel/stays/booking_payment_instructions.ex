@@ -10,9 +10,7 @@ defmodule Travel.Stays.BookingPaymentInstructions do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
-      {:ok, response} = Travel.Stays.BookingPaymentInstructions.create(config, "bok_123", %{
+      {:ok, response} = Travel.Stays.BookingPaymentInstructions.create("bok_123", %{
         card_id: "tcd_123"
       })
 
@@ -26,7 +24,6 @@ defmodule Travel.Stays.BookingPaymentInstructions do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `booking_id` - The booking ID
     * `params` - Payment instruction parameters:
       * `:card_id` - (required) The card ID to use for payment
@@ -37,9 +34,10 @@ defmodule Travel.Stays.BookingPaymentInstructions do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), String.t(), map()) ::
+  @spec create(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, booking_id, params) do
+  def create(booking_id, params) do
+    config = Travel.config!()
     Client.request(config, :post, "stays/bookings/#{booking_id}/payment_instructions", params)
   end
 end

@@ -9,16 +9,14 @@ defmodule Travel.Flights.BatchOfferRequests do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a batch offer request
-      {:ok, response} = Travel.Flights.BatchOfferRequests.create(config, %{
+      {:ok, response} = Travel.Flights.BatchOfferRequests.create(%{
         slices: [%{origin: "LHR", destination: "JFK", departure_date: "2025-06-01"}],
         passengers: [%{type: "adult"}]
       })
 
       # Poll for results
-      {:ok, response} = Travel.Flights.BatchOfferRequests.get(config, "bor_123")
+      {:ok, response} = Travel.Flights.BatchOfferRequests.get("bor_123")
 
   @link https://duffel.com/docs/api/batch-offer-requests
   """
@@ -31,7 +29,6 @@ defmodule Travel.Flights.BatchOfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Batch offer request parameters (same as regular offer requests)
     * `opts` - Optional query parameters (`supplier_timeout`)
 
@@ -41,9 +38,11 @@ defmodule Travel.Flights.BatchOfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map(), map() | nil) ::
+  @spec create(map(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params, opts \\ nil) do
+  def create(params, opts \\ nil) do
+    config = Travel.config!()
+
     query_params =
       if opts do
         Map.take(opts, [:supplier_timeout])
@@ -68,7 +67,6 @@ defmodule Travel.Flights.BatchOfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `batch_offer_request_id` - The batch offer request ID
 
   ## Returns
@@ -77,9 +75,11 @@ defmodule Travel.Flights.BatchOfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, batch_offer_request_id) do
+  def get(batch_offer_request_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/batch_offer_requests/#{batch_offer_request_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_batch_offer_request(response.data)

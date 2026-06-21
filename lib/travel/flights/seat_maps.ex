@@ -8,9 +8,7 @@ defmodule Travel.Flights.SeatMaps do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
-      {:ok, response} = Travel.Flights.SeatMaps.get(config, %{offer_id: "off_123"})
+      {:ok, response} = Travel.Flights.SeatMaps.get(%{offer_id: "off_123"})
 
   @link https://duffel.com/docs/api/seat-maps
   """
@@ -23,7 +21,6 @@ defmodule Travel.Flights.SeatMaps do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Query parameters:
       * `:offer_id` - (required) The offer ID
 
@@ -33,9 +30,11 @@ defmodule Travel.Flights.SeatMaps do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), map()) ::
+  @spec get(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, params) do
+  def get(params) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/seat_maps", nil, params) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_seat_map/1)

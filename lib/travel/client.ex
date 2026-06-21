@@ -159,7 +159,6 @@ defmodule Travel.Client do
     %{
       "Accept" => "application/json",
       "Content-Type" => "application/json",
-      "Accept-Encoding" => "gzip",
       "Authorization" => "Bearer #{config.access_token}",
       "Duffel-Version" => config.api_version,
       "User-Agent" => user_agent

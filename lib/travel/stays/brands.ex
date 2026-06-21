@@ -9,13 +9,11 @@ defmodule Travel.Stays.Brands do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # List all brands
-      {:ok, response} = Travel.Stays.Brands.list(config)
+      {:ok, response} = Travel.Stays.Brands.list()
 
       # Get a brand by ID
-      {:ok, response} = Travel.Stays.Brands.get(config, "brd_123")
+      {:ok, response} = Travel.Stays.Brands.get("brd_123")
 
   @link https://duffel.com/docs/api/stays/brands
   """
@@ -26,19 +24,17 @@ defmodule Travel.Stays.Brands do
   @doc """
   List all accommodation brands.
 
-  ## Parameters
-
-    * `config` - Travel configuration
-
   ## Returns
 
     * `{:ok, %Travel.Types.DuffelResponse{data: [%Types.StaysAccommodationBrand{}]}}` on success
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t()) ::
+  @spec list() ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config) do
+  def list do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/brands") do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &parse_brand/1)
@@ -54,7 +50,6 @@ defmodule Travel.Stays.Brands do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `brand_id` - The brand ID
 
   ## Returns
@@ -63,9 +58,11 @@ defmodule Travel.Stays.Brands do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, brand_id) do
+  def get(brand_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/brands/#{brand_id}") do
       {:ok, response} ->
         parsed_data = parse_brand(response.data)

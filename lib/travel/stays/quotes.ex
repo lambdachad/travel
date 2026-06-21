@@ -9,13 +9,11 @@ defmodule Travel.Stays.Quotes do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a quote from a rate
-      {:ok, response} = Travel.Stays.Quotes.create(config, "rate_123")
+      {:ok, response} = Travel.Stays.Quotes.create("rate_123")
 
       # Get a quote by ID
-      {:ok, response} = Travel.Stays.Quotes.get(config, "quo_123")
+      {:ok, response} = Travel.Stays.Quotes.get("quo_123")
 
   @link https://duffel.com/docs/api/stays/quotes
   """
@@ -28,7 +26,6 @@ defmodule Travel.Stays.Quotes do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `rate_id` - The ID of the rate to quote
 
   ## Returns
@@ -37,9 +34,11 @@ defmodule Travel.Stays.Quotes do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), String.t()) ::
+  @spec create(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, rate_id) do
+  def create(rate_id) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "stays/quotes", %{rate_id: rate_id}) do
       {:ok, response} ->
         parsed_data = Types.parse_quote(response.data)
@@ -55,7 +54,6 @@ defmodule Travel.Stays.Quotes do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `quote_id` - The ID of the quote
 
   ## Returns
@@ -64,9 +62,11 @@ defmodule Travel.Stays.Quotes do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, quote_id) do
+  def get(quote_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/quotes/#{quote_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_quote(response.data)

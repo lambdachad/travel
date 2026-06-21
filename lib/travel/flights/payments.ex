@@ -10,19 +10,17 @@ defmodule Travel.Flights.Payments do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a payment
-      {:ok, response} = Travel.Flights.Payments.create(config, %{
+      {:ok, response} = Travel.Flights.Payments.create(%{
         order_id: "ord_123",
         payment: %{type: "balance", amount: "150.00", currency: "GBP"}
       })
 
       # Get a payment
-      {:ok, response} = Travel.Flights.Payments.get(config, "pay_123")
+      {:ok, response} = Travel.Flights.Payments.get("pay_123")
 
       # List payments for an order
-      {:ok, response} = Travel.Flights.Payments.list(config, %{order_id: "ord_123"})
+      {:ok, response} = Travel.Flights.Payments.list(%{order_id: "ord_123"})
 
   @link https://duffel.com/docs/api/payments
   """
@@ -35,7 +33,6 @@ defmodule Travel.Flights.Payments do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Payment parameters:
       * `:order_id` - (required) The order ID to pay for
       * `:payment` - (required) Payment details (`type`, `amount`, `currency`)
@@ -46,9 +43,11 @@ defmodule Travel.Flights.Payments do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "air/payments", params) do
       {:ok, response} ->
         parsed_data = Types.parse_payment(response.data)
@@ -64,7 +63,6 @@ defmodule Travel.Flights.Payments do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `payment_id` - The payment ID
 
   ## Returns
@@ -73,9 +71,11 @@ defmodule Travel.Flights.Payments do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, payment_id) do
+  def get(payment_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/payments/#{payment_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_payment(response.data)
@@ -91,7 +91,6 @@ defmodule Travel.Flights.Payments do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:order_id` - (required) Filter by order ID
       * `:limit` - Results per page (max 200)
@@ -104,9 +103,11 @@ defmodule Travel.Flights.Payments do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/payments", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_payment/1)

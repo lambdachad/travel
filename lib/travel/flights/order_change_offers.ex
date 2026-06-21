@@ -9,13 +9,11 @@ defmodule Travel.Flights.OrderChangeOffers do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Get a change offer
-      {:ok, response} = Travel.Flights.OrderChangeOffers.get(config, "oco_123")
+      {:ok, response} = Travel.Flights.OrderChangeOffers.get("oco_123")
 
       # List change offers
-      {:ok, response} = Travel.Flights.OrderChangeOffers.list(config)
+      {:ok, response} = Travel.Flights.OrderChangeOffers.list()
 
   @link https://duffel.com/docs/api/order-change-offers
   """
@@ -28,7 +26,6 @@ defmodule Travel.Flights.OrderChangeOffers do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `offer_id` - The change offer ID
 
   ## Returns
@@ -37,9 +34,11 @@ defmodule Travel.Flights.OrderChangeOffers do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, offer_id) do
+  def get(offer_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/order_change_offers/#{offer_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_order_change_offer(response.data)
@@ -55,7 +54,6 @@ defmodule Travel.Flights.OrderChangeOffers do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:order_change_request_id` - (required) The order change request ID
       * `:limit` - Results per page
@@ -70,9 +68,11 @@ defmodule Travel.Flights.OrderChangeOffers do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/order_change_offers", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_order_change_offer/1)
@@ -91,8 +91,10 @@ defmodule Travel.Flights.OrderChangeOffers do
     A `Stream` that yields `%Travel.Types.DuffelResponse{}` for each page.
 
   """
-  @spec stream(Travel.t()) :: Enumerable.t()
-  def stream(config) do
+  @spec stream() :: Enumerable.t()
+  def stream do
+    config = Travel.config!()
+
     Client.stream(config, "air/order_change_offers")
     |> Stream.map(fn response ->
       parsed_data = Enum.map(response.data, &Types.parse_order_change_offer/1)

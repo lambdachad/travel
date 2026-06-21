@@ -10,16 +10,14 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # List changes for an order
-      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(config, %{order_id: "ord_123"})
+      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.list(%{order_id: "ord_123"})
 
       # Accept a change
-      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.accept(config, "aic_123")
+      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.accept("aic_123")
 
       # Update a change with action taken
-      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.update(config, "aic_123", %{
+      {:ok, response} = Travel.Flights.AirlineInitiatedChanges.update("aic_123", %{
         action_taken: "accepted"
       })
 
@@ -34,7 +32,6 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:order_id` - Filter by order ID
       * `:limit` - Results per page (max 200)
@@ -47,9 +44,11 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/airline_initiated_changes", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_airline_initiated_change/1)
@@ -65,7 +64,6 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `change_id` - The change ID to accept
 
   ## Returns
@@ -74,9 +72,10 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec accept(Travel.t(), String.t()) ::
+  @spec accept(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def accept(config, change_id) do
+  def accept(change_id) do
+    config = Travel.config!()
     path = "air/airline_initiated_changes/#{change_id}/actions/accept"
 
     case Client.request(config, :post, path) do
@@ -94,7 +93,6 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `change_id` - The change ID
     * `params` - Update parameters:
       * `:action_taken` - (required) One of `"accepted"`, `"cancelled"`, `"changed"`
@@ -105,9 +103,11 @@ defmodule Travel.Flights.AirlineInitiatedChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec update(Travel.t(), String.t(), map()) ::
+  @spec update(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def update(config, change_id, params) do
+  def update(change_id, params) do
+    config = Travel.config!()
+
     case Client.request(config, :patch, "air/airline_initiated_changes/#{change_id}", params) do
       {:ok, response} ->
         parsed_data = Types.parse_airline_initiated_change(response.data)

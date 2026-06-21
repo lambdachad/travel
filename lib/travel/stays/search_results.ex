@@ -8,8 +8,7 @@ defmodule Travel.Stays.SearchResults do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-      {:ok, response} = Travel.Stays.SearchResults.fetch_all_rates(config, "ser_123")
+      {:ok, response} = Travel.Stays.SearchResults.fetch_all_rates("ser_123")
 
   @link https://duffel.com/docs/api/stays/search-results
   """
@@ -22,7 +21,6 @@ defmodule Travel.Stays.SearchResults do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `search_result_id` - The ID of the search result
 
   ## Returns
@@ -31,9 +29,10 @@ defmodule Travel.Stays.SearchResults do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec fetch_all_rates(Travel.t(), String.t()) ::
+  @spec fetch_all_rates(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def fetch_all_rates(config, search_result_id) do
+  def fetch_all_rates(search_result_id) do
+    config = Travel.config!()
     path = "stays/search_results/#{search_result_id}/actions/fetch_all_rates"
 
     case Client.request(config, :post, path) do

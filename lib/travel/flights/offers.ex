@@ -11,16 +11,14 @@ defmodule Travel.Flights.Offers do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # List offers for an offer request
-      {:ok, response} = Travel.Flights.Offers.list(config, "orq_123")
+      {:ok, response} = Travel.Flights.Offers.list("orq_123")
 
       # Get a specific offer
-      {:ok, response} = Travel.Flights.Offers.get(config, "off_123")
+      {:ok, response} = Travel.Flights.Offers.get("off_123")
 
       # Price an offer
-      {:ok, response} = Travel.Flights.Offers.get_priced(config, "off_123", %{
+      {:ok, response} = Travel.Flights.Offers.get_priced("off_123", %{
         intended_payment_methods: [%{type: "balance"}],
         intended_services: []
       })
@@ -36,7 +34,6 @@ defmodule Travel.Flights.Offers do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `offer_id` - The offer ID
     * `opts` - Optional query parameters (`return_available_services`)
 
@@ -46,9 +43,11 @@ defmodule Travel.Flights.Offers do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t(), map() | nil) ::
+  @spec get(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, offer_id, opts \\ nil) do
+  def get(offer_id, opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/offers/#{offer_id}", nil, opts) do
       {:ok, response} ->
         parsed_data = Types.parse_offer(response.data)
@@ -64,7 +63,6 @@ defmodule Travel.Flights.Offers do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `offer_request_id` - The offer request ID
     * `opts` - Optional parameters (`limit`, `before`, `after`, `max_connections`, `sort`)
 
@@ -74,9 +72,10 @@ defmodule Travel.Flights.Offers do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), String.t(), map() | nil) ::
+  @spec list(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, offer_request_id, opts \\ nil) do
+  def list(offer_request_id, opts \\ nil) do
+    config = Travel.config!()
     query_params = Map.merge(opts || %{}, %{"offer_request_id" => offer_request_id})
 
     case Client.request(config, :get, "air/offers", nil, query_params) do
@@ -97,8 +96,9 @@ defmodule Travel.Flights.Offers do
     A `Stream` that yields `%Travel.Types.DuffelResponse{}` for each page.
 
   """
-  @spec stream(Travel.t(), String.t(), map() | nil) :: Enumerable.t()
-  def stream(config, offer_request_id, opts \\ nil) do
+  @spec stream(String.t(), map() | nil) :: Enumerable.t()
+  def stream(offer_request_id, opts \\ nil) do
+    config = Travel.config!()
     query_params = Map.merge(opts || %{}, %{"offer_request_id" => offer_request_id})
 
     Client.stream(config, "air/offers", query_params)
@@ -113,7 +113,6 @@ defmodule Travel.Flights.Offers do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `offer_id` - The offer ID
     * `passenger_id` - The passenger ID
     * `params` - Update parameters (`given_name`, `family_name`, `loyalty_programme_accounts`)
@@ -124,9 +123,10 @@ defmodule Travel.Flights.Offers do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec update(Travel.t(), String.t(), String.t(), map()) ::
+  @spec update(String.t(), String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def update(config, offer_id, passenger_id, params) do
+  def update(offer_id, passenger_id, params) do
+    config = Travel.config!()
     path = "air/offers/#{offer_id}/passengers/#{passenger_id}"
 
     case Client.request(config, :patch, path, params) do
@@ -144,7 +144,6 @@ defmodule Travel.Flights.Offers do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `offer_id` - The offer ID
     * `params` - Pricing parameters:
       * `:intended_payment_methods` - List of payment method objects
@@ -156,9 +155,10 @@ defmodule Travel.Flights.Offers do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get_priced(Travel.t(), String.t(), map()) ::
+  @spec get_priced(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get_priced(config, offer_id, params) do
+  def get_priced(offer_id, params) do
+    config = Travel.config!()
     path = "air/offers/#{offer_id}/actions/price"
 
     case Client.request(config, :post, path, params) do

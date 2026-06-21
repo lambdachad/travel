@@ -10,15 +10,13 @@ defmodule Travel.Flights.OrderChanges do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create an order change
-      {:ok, response} = Travel.Flights.OrderChanges.create(config, %{
+      {:ok, response} = Travel.Flights.OrderChanges.create(%{
         selected_order_change_offer: "oco_123"
       })
 
       # Confirm an order change
-      {:ok, response} = Travel.Flights.OrderChanges.confirm(config, "orc_123")
+      {:ok, response} = Travel.Flights.OrderChanges.confirm("orc_123")
 
   @link https://duffel.com/docs/api/order-changes
   """
@@ -31,7 +29,6 @@ defmodule Travel.Flights.OrderChanges do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Change parameters:
       * `:selected_order_change_offer` - (required) The change offer ID
 
@@ -41,9 +38,11 @@ defmodule Travel.Flights.OrderChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "air/order_changes", params) do
       {:ok, response} ->
         parsed_data = Types.parse_order_change(response.data)
@@ -59,7 +58,6 @@ defmodule Travel.Flights.OrderChanges do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `order_change_id` - The order change ID
 
   ## Returns
@@ -68,9 +66,11 @@ defmodule Travel.Flights.OrderChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, order_change_id) do
+  def get(order_change_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/order_changes/#{order_change_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_order_change(response.data)
@@ -86,7 +86,6 @@ defmodule Travel.Flights.OrderChanges do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `order_change_id` - The order change ID
     * `params` - (optional) Payment parameters:
       * `:payment` - Payment details (`amount`, `currency`, `type`, `three_d_secure_session_id`)
@@ -97,9 +96,10 @@ defmodule Travel.Flights.OrderChanges do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec confirm(Travel.t(), String.t(), map() | nil) ::
+  @spec confirm(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def confirm(config, order_change_id, params \\ nil) do
+  def confirm(order_change_id, params \\ nil) do
+    config = Travel.config!()
     path = "air/order_changes/#{order_change_id}/actions/confirm"
 
     case Client.request(config, :post, path, params) do

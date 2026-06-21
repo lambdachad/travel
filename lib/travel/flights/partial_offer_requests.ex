@@ -10,16 +10,14 @@ defmodule Travel.Flights.PartialOfferRequests do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a partial offer request
-      {:ok, response} = Travel.Flights.PartialOfferRequests.create(config, %{
+      {:ok, response} = Travel.Flights.PartialOfferRequests.create(%{
         slices: [%{origin: "LHR", destination: "JFK", departure_date: "2025-06-01"}],
         passengers: [%{type: "adult"}]
       })
 
       # Get with selected partial offers
-      {:ok, response} = Travel.Flights.PartialOfferRequests.get(config, "por_123", %{
+      {:ok, response} = Travel.Flights.PartialOfferRequests.get("por_123", %{
         selected_partial_offer: ["off_123"]
       })
 
@@ -34,7 +32,6 @@ defmodule Travel.Flights.PartialOfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Partial offer request parameters
     * `opts` - Optional query parameters (`supplier_timeout`)
 
@@ -44,9 +41,11 @@ defmodule Travel.Flights.PartialOfferRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map(), map() | nil) ::
+  @spec create(map(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params, opts \\ nil) do
+  def create(params, opts \\ nil) do
+    config = Travel.config!()
+
     query_params =
       if opts do
         Map.take(opts, [:supplier_timeout])
@@ -73,7 +72,6 @@ defmodule Travel.Flights.PartialOfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `partial_offer_request_id` - The partial offer request ID
     * `opts` - Optional query parameters (`selected_partial_offer`)
 
@@ -84,9 +82,11 @@ defmodule Travel.Flights.PartialOfferRequests do
 
   """
   @deprecated "This endpoint will be removed in the next major version of the Duffel API"
-  @spec get(Travel.t(), String.t(), map() | nil) ::
+  @spec get(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, partial_offer_request_id, opts \\ nil) do
+  def get(partial_offer_request_id, opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(
            config,
            :get,
@@ -110,7 +110,6 @@ defmodule Travel.Flights.PartialOfferRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `partial_offer_request_id` - The partial offer request ID
     * `opts` - Optional query parameters (`selected_partial_offer`)
 
@@ -121,9 +120,10 @@ defmodule Travel.Flights.PartialOfferRequests do
 
   """
   @deprecated "This endpoint will be removed in the next major version of the Duffel API"
-  @spec get_fares_by_id(Travel.t(), String.t(), map() | nil) ::
+  @spec get_fares_by_id(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get_fares_by_id(config, partial_offer_request_id, opts \\ nil) do
+  def get_fares_by_id(partial_offer_request_id, opts \\ nil) do
+    config = Travel.config!()
     path = "air/partial_offer_requests/#{partial_offer_request_id}/fares"
 
     case Client.request(config, :get, path, nil, opts) do

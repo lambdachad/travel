@@ -13,10 +13,8 @@ defmodule Travel.Flights.Orders do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create an order
-      {:ok, response} = Travel.Flights.Orders.create(config, %{
+      {:ok, response} = Travel.Flights.Orders.create(%{
         selected_offers: ["off_123"],
         passengers: [%{
           given_name: "John",
@@ -31,10 +29,10 @@ defmodule Travel.Flights.Orders do
       })
 
       # Get an order
-      {:ok, response} = Travel.Flights.Orders.get(config, "ord_123")
+      {:ok, response} = Travel.Flights.Orders.get("ord_123")
 
       # Update order metadata
-      {:ok, response} = Travel.Flights.Orders.update(config, "ord_123", %{
+      {:ok, response} = Travel.Flights.Orders.update("ord_123", %{
         metadata: %{"payment_intent_id" => "pit_123"}
       })
 
@@ -49,7 +47,6 @@ defmodule Travel.Flights.Orders do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Order parameters:
       * `:selected_offers` - (required) List of selected offer IDs (e.g., `["off_123"]`)
       * `:passengers` - (required) List of passenger details
@@ -65,9 +62,11 @@ defmodule Travel.Flights.Orders do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "air/orders", params) do
       {:ok, response} ->
         parsed_data = Types.parse_order(response.data)
@@ -83,7 +82,6 @@ defmodule Travel.Flights.Orders do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `order_id` - The order ID
 
   ## Returns
@@ -92,9 +90,11 @@ defmodule Travel.Flights.Orders do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, order_id) do
+  def get(order_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/orders/#{order_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_order(response.data)
@@ -110,7 +110,6 @@ defmodule Travel.Flights.Orders do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional parameters:
       * `:limit` - Results per page
       * `:before` / `:after` - Pagination cursors
@@ -125,9 +124,11 @@ defmodule Travel.Flights.Orders do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/orders", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_order/1)
@@ -146,8 +147,10 @@ defmodule Travel.Flights.Orders do
     A `Stream` that yields `%Travel.Types.DuffelResponse{}` for each page.
 
   """
-  @spec stream(Travel.t(), map() | nil) :: Enumerable.t()
-  def stream(config, opts \\ nil) do
+  @spec stream(map() | nil) :: Enumerable.t()
+  def stream(opts \\ nil) do
+    config = Travel.config!()
+
     Client.stream(config, "air/orders", opts)
     |> Stream.map(fn response ->
       parsed_data = Enum.map(response.data, &Types.parse_order/1)
@@ -160,7 +163,6 @@ defmodule Travel.Flights.Orders do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `order_id` - The order ID
     * `params` - Update parameters (typically `metadata`)
 
@@ -170,9 +172,11 @@ defmodule Travel.Flights.Orders do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec update(Travel.t(), String.t(), map()) ::
+  @spec update(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def update(config, order_id, params) do
+  def update(order_id, params) do
+    config = Travel.config!()
+
     case Client.request(config, :patch, "air/orders/#{order_id}", params) do
       {:ok, response} ->
         parsed_data = Types.parse_order(response.data)
@@ -188,7 +192,6 @@ defmodule Travel.Flights.Orders do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `order_id` - The order ID
 
   ## Returns
@@ -197,9 +200,10 @@ defmodule Travel.Flights.Orders do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get_available_services(Travel.t(), String.t()) ::
+  @spec get_available_services(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get_available_services(config, order_id) do
+  def get_available_services(order_id) do
+    config = Travel.config!()
     path = "air/orders/#{order_id}/available_services"
 
     case Client.request(config, :get, path) do
@@ -217,7 +221,6 @@ defmodule Travel.Flights.Orders do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `order_id` - The order ID
     * `params` - Service parameters:
       * `:payment` - Payment details
@@ -229,9 +232,10 @@ defmodule Travel.Flights.Orders do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec add_services(Travel.t(), String.t(), map()) ::
+  @spec add_services(String.t(), map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def add_services(config, order_id, params) do
+  def add_services(order_id, params) do
+    config = Travel.config!()
     path = "air/orders/#{order_id}/services"
 
     case Client.request(config, :post, path, params) do

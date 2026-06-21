@@ -8,8 +8,7 @@ defmodule Travel.Stays.LoyaltyProgrammes do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-      {:ok, response} = Travel.Stays.LoyaltyProgrammes.list(config)
+      {:ok, response} = Travel.Stays.LoyaltyProgrammes.list()
 
   @link https://duffel.com/docs/api/stays/loyalty-programmes
   """
@@ -20,19 +19,17 @@ defmodule Travel.Stays.LoyaltyProgrammes do
   @doc """
   List all loyalty programmes supported by Duffel Stays.
 
-  ## Parameters
-
-    * `config` - Travel configuration
-
   ## Returns
 
     * `{:ok, %Travel.Types.DuffelResponse{data: [%Types.StaysLoyaltyProgramme{}]}}` on success
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t()) ::
+  @spec list() ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config) do
+  def list do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/loyalty_programmes") do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_loyalty_programme/1)

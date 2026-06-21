@@ -8,10 +8,8 @@ defmodule Travel.Stays.Search do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Location-based search
-      {:ok, response} = Travel.Stays.Search.search(config, %{
+      {:ok, response} = Travel.Stays.Search.search(%{
         location: %{
           geographic_coordinates: %{latitude: 51.5, longitude: -0.1},
           radius: 5
@@ -23,7 +21,7 @@ defmodule Travel.Stays.Search do
       })
 
       # Accommodation-based search
-      {:ok, response} = Travel.Stays.Search.search(config, %{
+      {:ok, response} = Travel.Stays.Search.search(%{
         accommodation: %{
           ids: ["acc_0000AZ2OJbCJNYH4Y2Zm5j"],
           fetch_rates: true
@@ -47,7 +45,6 @@ defmodule Travel.Stays.Search do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Search parameters (see module docs for examples)
 
   ## Returns
@@ -56,9 +53,11 @@ defmodule Travel.Stays.Search do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec search(Travel.t(), map()) ::
+  @spec search(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def search(config, params) do
+  def search(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "stays/search", params) do
       {:ok, response} ->
         parsed_data = Types.parse_search_response(response.data)

@@ -11,23 +11,21 @@ defmodule Travel.Stays.Accommodation do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Get accommodation by ID
-      {:ok, response} = Travel.Stays.Accommodation.get(config, "acc_123")
+      {:ok, response} = Travel.Stays.Accommodation.get("acc_123")
 
       # List accommodations near a location
-      {:ok, response} = Travel.Stays.Accommodation.list(config, %{
+      {:ok, response} = Travel.Stays.Accommodation.list(%{
         latitude: 51.5,
         longitude: -0.1,
         radius: 5
       })
 
       # Get suggestions for a query
-      {:ok, response} = Travel.Stays.Accommodation.suggestions(config, "Hilton London")
+      {:ok, response} = Travel.Stays.Accommodation.suggestions("Hilton London")
 
       # Get reviews for an accommodation
-      {:ok, response} = Travel.Stays.Accommodation.reviews(config, "acc_123")
+      {:ok, response} = Travel.Stays.Accommodation.reviews("acc_123")
 
   @link https://duffel.com/docs/api/stays/accommodation
   """
@@ -40,7 +38,6 @@ defmodule Travel.Stays.Accommodation do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `accommodation_id` - The accommodation ID
 
   ## Returns
@@ -49,9 +46,11 @@ defmodule Travel.Stays.Accommodation do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, accommodation_id) do
+  def get(accommodation_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/accommodation/#{accommodation_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_accommodation(response.data)
@@ -67,7 +66,6 @@ defmodule Travel.Stays.Accommodation do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:latitude` - (required) Latitude for radius search
       * `:longitude` - (required) Longitude for radius search
@@ -82,9 +80,11 @@ defmodule Travel.Stays.Accommodation do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "stays/accommodation", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_accommodation/1)
@@ -100,7 +100,6 @@ defmodule Travel.Stays.Accommodation do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Query parameters including `latitude`, `longitude`, `radius`
 
   ## Returns
@@ -108,8 +107,10 @@ defmodule Travel.Stays.Accommodation do
     A `Stream` that yields `%Travel.Types.DuffelResponse{}` for each page.
 
   """
-  @spec stream(Travel.t(), map()) :: Enumerable.t()
-  def stream(config, opts) do
+  @spec stream(map()) :: Enumerable.t()
+  def stream(opts) do
+    config = Travel.config!()
+
     Client.stream(config, "stays/accommodation", opts)
     |> Stream.map(fn response ->
       parsed_data = Enum.map(response.data, &Types.parse_accommodation/1)
@@ -122,7 +123,6 @@ defmodule Travel.Stays.Accommodation do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `query` - Search query string
     * `location` - (optional) Location filter with `radius` and `geographic_coordinates`
 
@@ -132,9 +132,10 @@ defmodule Travel.Stays.Accommodation do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec suggestions(Travel.t(), String.t(), map() | nil) ::
+  @spec suggestions(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def suggestions(config, query, location \\ nil) do
+  def suggestions(query, location \\ nil) do
+    config = Travel.config!()
     body = %{query: query}
     body = if location, do: Map.put(body, :location, location), else: body
 
@@ -153,7 +154,6 @@ defmodule Travel.Stays.Accommodation do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `accommodation_id` - The accommodation ID
     * `opts` - (optional) Pagination options (`limit`, `before`, `after`)
 
@@ -163,9 +163,11 @@ defmodule Travel.Stays.Accommodation do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec reviews(Travel.t(), String.t(), map() | nil) ::
+  @spec reviews(String.t(), map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def reviews(config, accommodation_id, opts \\ nil) do
+  def reviews(accommodation_id, opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(
            config,
            :get,

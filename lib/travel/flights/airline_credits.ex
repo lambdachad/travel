@@ -10,10 +10,8 @@ defmodule Travel.Flights.AirlineCredits do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
        # Create an airline credit
-      {:ok, response} = Travel.Flights.AirlineCredits.create(config, %{
+      {:ok, response} = Travel.Flights.AirlineCredits.create(%{
         airline_iata_code: "BA",
         amount: "100.00",
         amount_currency: "GBP",
@@ -24,10 +22,10 @@ defmodule Travel.Flights.AirlineCredits do
       })
 
       # Get an airline credit
-      {:ok, response} = Travel.Flights.AirlineCredits.get(config, "acd_123")
+      {:ok, response} = Travel.Flights.AirlineCredits.get("acd_123")
 
       # List airline credits
-      {:ok, response} = Travel.Flights.AirlineCredits.list(config, %{limit: 20})
+      {:ok, response} = Travel.Flights.AirlineCredits.list(%{limit: 20})
 
   @link https://duffel.com/docs/api/airline-credits
   """
@@ -40,7 +38,6 @@ defmodule Travel.Flights.AirlineCredits do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Airline credit parameters:
       * `:airline_iata_code` - (required) The airline IATA code
       * `:amount` - (required) The credit amount
@@ -59,9 +56,11 @@ defmodule Travel.Flights.AirlineCredits do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "air/airline_credits", params) do
       {:ok, response} ->
         parsed_data = Types.parse_airline_credit(response.data)
@@ -77,7 +76,6 @@ defmodule Travel.Flights.AirlineCredits do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `credit_id` - The airline credit ID
 
   ## Returns
@@ -86,9 +84,11 @@ defmodule Travel.Flights.AirlineCredits do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, credit_id) do
+  def get(credit_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/airline_credits/#{credit_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_airline_credit(response.data)
@@ -104,7 +104,6 @@ defmodule Travel.Flights.AirlineCredits do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `opts` - Optional query parameters:
       * `:limit` - Results per page (max 200)
       * `:before` - Cursor for previous page
@@ -117,9 +116,11 @@ defmodule Travel.Flights.AirlineCredits do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec list(Travel.t(), map() | nil) ::
+  @spec list(map() | nil) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def list(config, opts \\ nil) do
+  def list(opts \\ nil) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/airline_credits", nil, opts) do
       {:ok, response} ->
         parsed_data = Enum.map(response.data, &Types.parse_airline_credit/1)

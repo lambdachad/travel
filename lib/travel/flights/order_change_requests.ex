@@ -9,10 +9,8 @@ defmodule Travel.Flights.OrderChangeRequests do
 
   ## Examples
 
-      config = Travel.new(access_token: "duffel_test_xxx")
-
       # Create a change request
-      {:ok, response} = Travel.Flights.OrderChangeRequests.create(config, %{
+      {:ok, response} = Travel.Flights.OrderChangeRequests.create(%{
         order_id: "ord_123",
         slices: %{
           add: [%{origin: "LHR", destination: "CDG", departure_date: "2025-07-01"}],
@@ -31,7 +29,6 @@ defmodule Travel.Flights.OrderChangeRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `params` - Change request parameters:
       * `:order_id` - (required) The order ID to change
       * `:slices` - (required) Map with `add` and `remove` slice lists
@@ -42,9 +39,11 @@ defmodule Travel.Flights.OrderChangeRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec create(Travel.t(), map()) ::
+  @spec create(map()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def create(config, params) do
+  def create(params) do
+    config = Travel.config!()
+
     case Client.request(config, :post, "air/order_change_requests", params) do
       {:ok, response} ->
         parsed_data = Types.parse_order_change_request(response.data)
@@ -60,7 +59,6 @@ defmodule Travel.Flights.OrderChangeRequests do
 
   ## Parameters
 
-    * `config` - Travel configuration
     * `change_request_id` - The change request ID
 
   ## Returns
@@ -69,9 +67,11 @@ defmodule Travel.Flights.OrderChangeRequests do
     * `{:error, %Travel.Error{}}` on failure
 
   """
-  @spec get(Travel.t(), String.t()) ::
+  @spec get(String.t()) ::
           {:ok, Travel.Types.DuffelResponse.t()} | {:error, Travel.Error.t() | term()}
-  def get(config, change_request_id) do
+  def get(change_request_id) do
+    config = Travel.config!()
+
     case Client.request(config, :get, "air/order_change_requests/#{change_request_id}") do
       {:ok, response} ->
         parsed_data = Types.parse_order_change_request(response.data)
